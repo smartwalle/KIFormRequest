@@ -8,12 +8,9 @@
 
 #import "KIFormRequest.h"
 
-@interface KIHTTPRequestOperationManager : AFHTTPRequestOperationManager
-@end
-
 @implementation KIHTTPRequestOperationManager
 
-+ (KIHTTPRequestOperationManager *)sharedRequestOperationManager {
++ (KIHTTPRequestOperationManager *)sharedManager {
     static dispatch_once_t onceToken;
     static KIHTTPRequestOperationManager *REQUEST_OPERATION_MANAGER = nil;
     dispatch_once(&onceToken, ^{
@@ -71,7 +68,7 @@
 
 - (id)initWithParam:(KIRequestParam *)param {
     
-    self.requestManager = [KIHTTPRequestOperationManager sharedRequestOperationManager];
+    self.requestManager = [KIHTTPRequestOperationManager sharedManager];
     
     [param.headers enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
         [self.requestManager.requestSerializer setValue:obj forHTTPHeaderField:key];

@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   #
 
   s.name         = "KIFormRequest"
-  s.version      = "0.1"
+  s.version      = "0.0.1"
   s.summary      = "KIFormRequest"
 
   s.description  = <<-DESC
