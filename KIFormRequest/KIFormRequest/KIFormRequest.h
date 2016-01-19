@@ -30,6 +30,8 @@ typedef void(^KIFormRequestDidFailedBlock)      (KIFormRequest *request, NSInteg
 
 - (id)initWithParam:(KIRequestParam *)param;
 
+- (id)initWithParam:(KIRequestParam *)param manager:(KIHTTPRequestOperationManager *)manager;
+
 - (void)startRequest:(NSString *)identifier
        finishedBlock:(KIFormRequestDidFinishedBlock)finishedBlock
          failedBlock:(KIFormRequestDidFailedBlock)failedBlock;

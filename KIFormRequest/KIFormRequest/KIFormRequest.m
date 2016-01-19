@@ -67,8 +67,12 @@
 }
 
 - (id)initWithParam:(KIRequestParam *)param {
+    return [self initWithParam:param manager:[KIHTTPRequestOperationManager sharedManager]];
+}
+
+- (id)initWithParam:(KIRequestParam *)param manager:(KIHTTPRequestOperationManager *)manager {
     
-    self.requestManager = [KIHTTPRequestOperationManager sharedManager];
+    self.requestManager = manager;
     
     [param.headers enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
         [self.requestManager.requestSerializer setValue:obj forHTTPHeaderField:key];
