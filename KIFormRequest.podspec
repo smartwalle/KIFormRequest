@@ -12,7 +12,6 @@ Pod::Spec.new do |s|
   s.platform     = :ios, "7.0"
   s.source       = { :git => "https://github.com/smartwalle/KIFormRequest.git", :tag => "#{s.version}" }
   s.source_files  = "KIFormRequest/KIFormRequest/*.{h,m}", "KIFormRequest/KIFormRequest/Reachability/*.{h,m}"
-  s.exclude_files = "Classes/Exclude"
   s.requires_arc  = true
   s.dependency "AFNetworking", "~> 2.5.4"
 end

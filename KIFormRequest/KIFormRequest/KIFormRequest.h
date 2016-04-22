@@ -13,6 +13,10 @@
 typedef void(^KIFormRequestDidFinishedBlock)    (KIFormRequest *request, NSInteger statusCode, id responseObject);
 typedef void(^KIFormRequestDidFailedBlock)      (KIFormRequest *request, NSInteger statusCode, NSError *error);
 
+@interface KIHTTPRequestOperationManager : AFHTTPRequestOperationManager
++ (KIHTTPRequestOperationManager *)sharedManager;
+@end
+
 @interface KIFormRequest : AFHTTPRequestOperation {
     NSString                    *_identifier;
     KIRequestParam              *_requestParam;
@@ -25,6 +29,8 @@ typedef void(^KIFormRequestDidFailedBlock)      (KIFormRequest *request, NSInteg
 @property (nonatomic, readonly)         NSError         *error;
 
 - (id)initWithParam:(KIRequestParam *)param;
+
+- (id)initWithParam:(KIRequestParam *)param manager:(KIHTTPRequestOperationManager *)manager;
 
 - (void)startRequest:(NSString *)identifier
        finishedBlock:(KIFormRequestDidFinishedBlock)finishedBlock
