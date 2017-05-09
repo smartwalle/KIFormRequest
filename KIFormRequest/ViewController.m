@@ -19,13 +19,16 @@
     [super viewDidLoad];
     
     KIFormRequest *r = [[KIFormRequest alloc] init];
-    [r setURLString:@""];
+    [r setURLString:@"https://api.github.com/repos/vmg/redcarpet/issues"];
     [r setMethod:@"GET"];
-    [r setValue:@"" forKey:@"key1"];
-    [r setValue:@"" forParamField:@"key2"];
+    [r setValue:@"closed" forKey:@"state"];
+//    [r setValue:@"closed" forParam:@"state"];
     
     [r successBlock:^(NSInteger statusCode, id responseObject) {
-        NSLog(@"%d--%@", statusCode, responseObject);
+        NSLog(@"%ld--%@", (long)statusCode, responseObject);
+    }];
+    [r failureBlock:^(NSInteger statusCode, NSError *error, NSData *responseData) {
+        NSLog(@"%@", error);
     }];
     [r startRequest];
 }

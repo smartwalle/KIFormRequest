@@ -12,20 +12,20 @@
 - (NSURLSessionDataTask *)dataTaskWithHTTPMethod:(NSString *)method
                                        URLString:(NSString *)URLString
                                       parameters:(id)parameters
-                                  uploadProgress:(nullable void (^)(NSProgress *uploadProgress)) uploadProgress
-                                downloadProgress:(nullable void (^)(NSProgress *downloadProgress)) downloadProgress
+                                  uploadProgress:(void (^)(NSProgress *uploadProgress))uploadProgress
+                                downloadProgress:(void (^)(NSProgress *downloadProgress))downloadProgress
                                          success:(void (^)(NSURLSessionDataTask *, id))success
                                          failure:(void (^)(NSURLSessionDataTask *, NSError *))failure;
 @end
 
-@interface KIFormRequestFile : NSObject
-@property (nonatomic, strong) NSData *data;
+@interface KIRequestFile : NSObject
+@property (nonatomic, strong) NSData   *data;
 @property (nonatomic, copy)   NSString *key;
 @property (nonatomic, copy)   NSString *fileName;
 @property (nonatomic, copy)   NSString *mimeType;
 @end
 
-@implementation KIFormRequestFile
+@implementation KIRequestFile
 @end
 
 @interface KIFormRequest ()
@@ -67,6 +67,7 @@
     return manager;
 }
 
+#pragma mark - Lifecycle
 - (void)dealloc {
 }
 
@@ -86,7 +87,7 @@
 
 #pragma mark - KVC
 - (void)setValue:(id)value forKey:(NSString *)key {
-    [self setValue:value forParamField:key];
+    [self setValue:value forParam:key];
 }
 
 - (id)valueForKey:(NSString *)key {
@@ -102,7 +103,7 @@
     _URLString = [URLString copy];
 }
 
-- (void)setValue:(id)value forHeaderField:(NSString *)field {
+- (void)setValue:(id)value forHeader:(NSString *)field {
     if (field == nil) {
         return;
     }
@@ -113,14 +114,14 @@
     [[self headers] setValue:value forKey:field];
 }
 
-- (void)removeHeaderWithField:(NSString *)field {
+- (void)removeHeader:(NSString *)field {
     if (field == nil) {
         return ;
     }
     [[self headers] removeObjectForKey:field];
 }
 
-- (void)setValue:(id)value forParamField:(NSString *)field {
+- (void)setValue:(id)value forParam:(NSString *)field {
     if (field == nil) {
         return ;
     }
@@ -131,7 +132,7 @@
     [[self params] setValue:value forKey:field];
 }
 
-- (void)removeParamWithField:(NSString *)field {
+- (void)removeParam:(NSString *)field {
     if (field == nil) {
         return ;
     }
@@ -146,7 +147,7 @@
     if (fileData == nil || key == nil) {
         return ;
     }
-    KIFormRequestFile *file = [[KIFormRequestFile alloc] init];
+    KIRequestFile *file = [[KIRequestFile alloc] init];
     [file setData:fileData];
     [file setFileName:fileName];
     [file setKey:key];
@@ -156,7 +157,7 @@
 }
 
 - (void)addPNGFile:(UIImage *)image forKey:(NSString *)key fileName:(NSString *)fileName {
-    [self addFile:UIImagePNGRepresentation(image) forKey:key fileName:fileName mimeType:@"image/jpeg"];
+    [self addFile:UIImagePNGRepresentation(image) forKey:key fileName:fileName mimeType:@"image/png"];
 }
 
 - (void)addJPEGFile:(UIImage *)image forKey:(NSString *)key fileName:(NSString *)fileName {
@@ -191,6 +192,7 @@
 }
 
 #pragma mark - Private Methods
+#pragma mark - 自定义 HTTP Body 的请求
 - (NSURLSessionDataTask *)requestWithBody {
     AFHTTPSessionManager *manager = [self manager];
     __weak KIFormRequest *weakSelf = self;
@@ -216,6 +218,7 @@
     return task;
 }
 
+#pragma mark - 上传文件
 - (NSURLSessionDataTask *)requestWithFile {
     AFHTTPSessionManager *manager = [self manager];
     __weak KIFormRequest *weakSelf = self;
@@ -223,7 +226,7 @@
     NSURLSessionDataTask *task = [manager POST:self.URLString
                                     parameters:self.params
                      constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
-                         for (KIFormRequestFile *file in weakSelf.files.allValues) {
+                         for (KIRequestFile *file in weakSelf.files.allValues) {
                              [formData appendPartWithFileData:file.data name:file.key fileName:file.fileName mimeType:file.mimeType];
                          }
                      } progress:^(NSProgress *uploadProgress) {
@@ -236,6 +239,7 @@
     return task;
 }
 
+#pragma mark - 普通的 HTTP 请求
 - (NSURLSessionDataTask *)defaultRequest {
     AFHTTPSessionManager *manager = [self manager];
     __weak KIFormRequest *weakSelf = self;

@@ -37,14 +37,14 @@ typedef void(^KIFormRequestUploadProgressBlock)   (NSProgress *uploadProgress);
 - (void)setURLString:(NSString *)URLString;
 
 // HTTP 请求头
-- (void)setValue:(id)value forHeaderField:(NSString *)field;
+- (void)setValue:(id)value forHeader:(NSString *)field;
 
-- (void)removeHeaderWithField:(NSString *)field;
+- (void)removeHeader:(NSString *)field;
 
 // HTTP 请求参数
-- (void)setValue:(id)value forParamField:(NSString *)field;
+- (void)setValue:(id)value forParam:(NSString *)field;
 
-- (void)removeParamWithField:(NSString *)field;
+- (void)removeParam:(NSString *)field;
 
 // HTTP Body
 - (void)setHttpBody:(id)body;
