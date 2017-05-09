@@ -14,7 +14,7 @@
             buildForArchiving = "YES">
             <BuildableReference
                BuildableIdentifier = 'primary'
-               BlueprintIdentifier = 'D07EA1A7729EF81FAE95E3B1A27A0756'
+               BlueprintIdentifier = 'CA353EC6D2874FFE51B9517AC4246A3D'
                BlueprintName = 'Pods-KIFormRequest'
                ReferencedContainer = 'container:Pods.xcodeproj'
                BuildableName = 'libPods-KIFormRequest.a'>

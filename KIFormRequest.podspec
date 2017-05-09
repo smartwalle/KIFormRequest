@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "KIFormRequest"
-  s.version      = "0.0.1"
+  s.version      = "3.0.0"
   s.summary      = "KIFormRequest"
   s.description  = <<-DESC
                   KIFormRequest.
@@ -13,5 +13,5 @@ Pod::Spec.new do |s|
   s.source       = { :git => "https://github.com/smartwalle/KIFormRequest.git", :tag => "#{s.version}" }
   s.source_files  = "KIFormRequest/KIFormRequest/*.{h,m}", "KIFormRequest/KIFormRequest/Reachability/*.{h,m}"
   s.requires_arc  = true
-  s.dependency "AFNetworking", "~> 2.5.4"
+  s.dependency "AFNetworking"
 end

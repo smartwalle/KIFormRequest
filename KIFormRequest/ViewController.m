@@ -7,6 +7,7 @@
 //
 
 #import "ViewController.h"
+#import "KIFormRequest.h"
 
 @interface ViewController ()
 
@@ -16,7 +17,17 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view, typically from a nib.
+    
+    KIFormRequest *r = [[KIFormRequest alloc] init];
+    [r setURLString:@""];
+    [r setMethod:@"GET"];
+    [r setValue:@"" forKey:@"key1"];
+    [r setValue:@"" forParamField:@"key2"];
+    
+    [r successBlock:^(NSInteger statusCode, id responseObject) {
+        NSLog(@"%d--%@", statusCode, responseObject);
+    }];
+    [r startRequest];
 }
 
 - (void)didReceiveMemoryWarning {

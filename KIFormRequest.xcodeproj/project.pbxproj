@@ -14,12 +14,10 @@
 		1846A4B01BE744AC007E2D7C /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1846A4AF1BE744AC007E2D7C /* Images.xcassets */; };
 		1846A4B31BE744AC007E2D7C /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1846A4B11BE744AC007E2D7C /* LaunchScreen.xib */; };
 		1846A4BF1BE744AC007E2D7C /* KIFormRequestTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1846A4BE1BE744AC007E2D7C /* KIFormRequestTests.m */; };
-		1846A4D21BE74555007E2D7C /* KIFormRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 1846A4CC1BE74555007E2D7C /* KIFormRequest.m */; };
 		1846A4D31BE74555007E2D7C /* KINetworkObserver.m in Sources */ = {isa = PBXBuildFile; fileRef = 1846A4CE1BE74555007E2D7C /* KINetworkObserver.m */; };
-		1846A4D41BE74555007E2D7C /* KIRequestParam.m in Sources */ = {isa = PBXBuildFile; fileRef = 1846A4D01BE74555007E2D7C /* KIRequestParam.m */; };
-		1846A4D71BE74914007E2D7C /* NSObject+KIKeyAndValues.m in Sources */ = {isa = PBXBuildFile; fileRef = 1846A4D61BE74914007E2D7C /* NSObject+KIKeyAndValues.m */; };
 		1846A4DB1BE7499A007E2D7C /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 1846A4DA1BE7499A007E2D7C /* Reachability.m */; };
-		49115623684C30BC4A35954B /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A802328C97E24D185104DCF /* libPods.a */; };
+		1892B1191EC163EF0011736D /* KIFormRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 1892B1181EC163EF0011736D /* KIFormRequest.m */; };
+		FD7CED26C680DD98E416ADA7 /* libPods-KIFormRequest.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9FC310E93B143F415C2CDE9B /* libPods-KIFormRequest.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -46,19 +44,15 @@
 		1846A4B81BE744AC007E2D7C /* KIFormRequestTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KIFormRequestTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1846A4BD1BE744AC007E2D7C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		1846A4BE1BE744AC007E2D7C /* KIFormRequestTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KIFormRequestTests.m; sourceTree = "<group>"; };
-		1846A4CB1BE74555007E2D7C /* KIFormRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KIFormRequest.h; sourceTree = "<group>"; };
-		1846A4CC1BE74555007E2D7C /* KIFormRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KIFormRequest.m; sourceTree = "<group>"; };
 		1846A4CD1BE74555007E2D7C /* KINetworkObserver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KINetworkObserver.h; sourceTree = "<group>"; };
 		1846A4CE1BE74555007E2D7C /* KINetworkObserver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KINetworkObserver.m; sourceTree = "<group>"; };
-		1846A4CF1BE74555007E2D7C /* KIRequestParam.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KIRequestParam.h; sourceTree = "<group>"; };
-		1846A4D01BE74555007E2D7C /* KIRequestParam.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KIRequestParam.m; sourceTree = "<group>"; };
-		1846A4D51BE74914007E2D7C /* NSObject+KIKeyAndValues.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+KIKeyAndValues.h"; sourceTree = "<group>"; };
-		1846A4D61BE74914007E2D7C /* NSObject+KIKeyAndValues.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+KIKeyAndValues.m"; sourceTree = "<group>"; };
 		1846A4D91BE7499A007E2D7C /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
 		1846A4DA1BE7499A007E2D7C /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
-		1A802328C97E24D185104DCF /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		3F913A77289EBB8289E92657 /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
-		D97525A593A1DD42C7B648B3 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
+		1892B1171EC163EF0011736D /* KIFormRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KIFormRequest.h; sourceTree = "<group>"; };
+		1892B1181EC163EF0011736D /* KIFormRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KIFormRequest.m; sourceTree = "<group>"; };
+		9FC310E93B143F415C2CDE9B /* libPods-KIFormRequest.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-KIFormRequest.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		BD4559311DC3FBCB3E3BF878 /* Pods-KIFormRequest.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KIFormRequest.debug.xcconfig"; path = "Pods/Target Support Files/Pods-KIFormRequest/Pods-KIFormRequest.debug.xcconfig"; sourceTree = "<group>"; };
+		F9DD904610B69BE7EA26A958 /* Pods-KIFormRequest.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KIFormRequest.release.xcconfig"; path = "Pods/Target Support Files/Pods-KIFormRequest/Pods-KIFormRequest.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,7 +60,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				49115623684C30BC4A35954B /* libPods.a in Frameworks */,
+				FD7CED26C680DD98E416ADA7 /* libPods-KIFormRequest.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -86,8 +80,8 @@
 				1846A4A11BE744AC007E2D7C /* KIFormRequest */,
 				1846A4BB1BE744AC007E2D7C /* KIFormRequestTests */,
 				1846A4A01BE744AC007E2D7C /* Products */,
-				ADE0BF8194D2242A06F5AAD0 /* Pods */,
-				67D9BC93EE5E37E8C3EF650F /* Frameworks */,
+				2AE4E7AA4DC3FD219EBFDAEC /* Pods */,
+				C6C72C639A6DDD93A760DA6B /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -146,14 +140,10 @@
 			isa = PBXGroup;
 			children = (
 				1846A4D81BE7499A007E2D7C /* Reachability */,
-				1846A4CB1BE74555007E2D7C /* KIFormRequest.h */,
-				1846A4CC1BE74555007E2D7C /* KIFormRequest.m */,
 				1846A4CD1BE74555007E2D7C /* KINetworkObserver.h */,
 				1846A4CE1BE74555007E2D7C /* KINetworkObserver.m */,
-				1846A4CF1BE74555007E2D7C /* KIRequestParam.h */,
-				1846A4D01BE74555007E2D7C /* KIRequestParam.m */,
-				1846A4D51BE74914007E2D7C /* NSObject+KIKeyAndValues.h */,
-				1846A4D61BE74914007E2D7C /* NSObject+KIKeyAndValues.m */,
+				1892B1171EC163EF0011736D /* KIFormRequest.h */,
+				1892B1181EC163EF0011736D /* KIFormRequest.m */,
 			);
 			path = KIFormRequest;
 			sourceTree = "<group>";
@@ -167,21 +157,21 @@
 			path = Reachability;
 			sourceTree = "<group>";
 		};
-		67D9BC93EE5E37E8C3EF650F /* Frameworks */ = {
+		2AE4E7AA4DC3FD219EBFDAEC /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				1A802328C97E24D185104DCF /* libPods.a */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		ADE0BF8194D2242A06F5AAD0 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				3F913A77289EBB8289E92657 /* Pods.debug.xcconfig */,
-				D97525A593A1DD42C7B648B3 /* Pods.release.xcconfig */,
+				BD4559311DC3FBCB3E3BF878 /* Pods-KIFormRequest.debug.xcconfig */,
+				F9DD904610B69BE7EA26A958 /* Pods-KIFormRequest.release.xcconfig */,
 			);
 			name = Pods;
+			sourceTree = "<group>";
+		};
+		C6C72C639A6DDD93A760DA6B /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				9FC310E93B143F415C2CDE9B /* libPods-KIFormRequest.a */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -191,12 +181,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1846A4C21BE744AC007E2D7C /* Build configuration list for PBXNativeTarget "KIFormRequest" */;
 			buildPhases = (
-				C6554470BDCA01CDFB04D1B7 /* Check Pods Manifest.lock */,
+				4AABFB66A37886AC65AB2700 /* [CP] Check Pods Manifest.lock */,
 				1846A49B1BE744AC007E2D7C /* Sources */,
 				1846A49C1BE744AC007E2D7C /* Frameworks */,
 				1846A49D1BE744AC007E2D7C /* Resources */,
-				F489047C3F60CC0A58011774 /* Copy Pods Resources */,
-				1FD0D0D3D696E9BFF301088A /* Embed Pods Frameworks */,
+				9724182984325C770AAFFDFF /* [CP] Embed Pods Frameworks */,
+				23FE92B6B57BD21FDDA80AC5 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -283,49 +273,49 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		1FD0D0D3D696E9BFF301088A /* Embed Pods Frameworks */ = {
+		23FE92B6B57BD21FDDA80AC5 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Embed Pods Frameworks";
+			name = "[CP] Copy Pods Resources";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods/Pods-frameworks.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-KIFormRequest/Pods-KIFormRequest-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		C6554470BDCA01CDFB04D1B7 /* Check Pods Manifest.lock */ = {
+		4AABFB66A37886AC65AB2700 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Check Pods Manifest.lock";
+			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
 			showEnvVarsInLog = 0;
 		};
-		F489047C3F60CC0A58011774 /* Copy Pods Resources */ = {
+		9724182984325C770AAFFDFF /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Copy Pods Resources";
+			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods/Pods-resources.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-KIFormRequest/Pods-KIFormRequest-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -336,10 +326,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				1846A4D31BE74555007E2D7C /* KINetworkObserver.m in Sources */,
-				1846A4D71BE74914007E2D7C /* NSObject+KIKeyAndValues.m in Sources */,
 				1846A4DB1BE7499A007E2D7C /* Reachability.m in Sources */,
-				1846A4D21BE74555007E2D7C /* KIFormRequest.m in Sources */,
-				1846A4D41BE74555007E2D7C /* KIRequestParam.m in Sources */,
+				1892B1191EC163EF0011736D /* KIFormRequest.m in Sources */,
 				1846A4AB1BE744AC007E2D7C /* ViewController.m in Sources */,
 				1846A4A81BE744AC007E2D7C /* AppDelegate.m in Sources */,
 				1846A4A51BE744AC007E2D7C /* main.m in Sources */,
@@ -462,7 +450,7 @@
 		};
 		1846A4C31BE744AC007E2D7C /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3F913A77289EBB8289E92657 /* Pods.debug.xcconfig */;
+			baseConfigurationReference = BD4559311DC3FBCB3E3BF878 /* Pods-KIFormRequest.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = KIFormRequest/Info.plist;
@@ -474,7 +462,7 @@
 		};
 		1846A4C41BE744AC007E2D7C /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = D97525A593A1DD42C7B648B3 /* Pods.release.xcconfig */;
+			baseConfigurationReference = F9DD904610B69BE7EA26A958 /* Pods-KIFormRequest.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = KIFormRequest/Info.plist;

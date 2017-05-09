@@ -1,286 +1,336 @@
 //
 //  KIFormRequest.m
-//  Kitalker
+//  KIFormRequest
 //
-//  Created by 杨 烽 on 12-10-29.
-//
+//  Created by apple on 17/5/9.
+//  Copyright © 2017年 smartwalle. All rights reserved.
 //
 
 #import "KIFormRequest.h"
 
-@implementation KIHTTPRequestOperationManager
+@protocol AFHTTPManager <NSObject>
+- (NSURLSessionDataTask *)dataTaskWithHTTPMethod:(NSString *)method
+                                       URLString:(NSString *)URLString
+                                      parameters:(id)parameters
+                                  uploadProgress:(nullable void (^)(NSProgress *uploadProgress)) uploadProgress
+                                downloadProgress:(nullable void (^)(NSProgress *downloadProgress)) downloadProgress
+                                         success:(void (^)(NSURLSessionDataTask *, id))success
+                                         failure:(void (^)(NSURLSessionDataTask *, NSError *))failure;
+@end
 
-+ (KIHTTPRequestOperationManager *)sharedManager {
-    static dispatch_once_t onceToken;
-    static KIHTTPRequestOperationManager *REQUEST_OPERATION_MANAGER = nil;
-    dispatch_once(&onceToken, ^{
-        REQUEST_OPERATION_MANAGER = [[KIHTTPRequestOperationManager alloc] init];
-        
-        NSMutableSet *contentTypes = [[NSMutableSet alloc] init];
-        [contentTypes addObject:@"text/html"];
-        [contentTypes addObject:@"text/javascript"];
-        [contentTypes addObject:@"application/json"];
-        [contentTypes addObject:@"text/json"];
-        [contentTypes addObject:@"application/xml"];
-        [contentTypes addObject:@"text/xml"];
-        [contentTypes addObject:@"application/x-plist"];
-        
-        [REQUEST_OPERATION_MANAGER.responseSerializer setAcceptableContentTypes:contentTypes];
+@interface KIFormRequestFile : NSObject
+@property (nonatomic, strong) NSData *data;
+@property (nonatomic, copy)   NSString *key;
+@property (nonatomic, copy)   NSString *fileName;
+@property (nonatomic, copy)   NSString *mimeType;
+@end
 
-        NSOperationQueue *operationQueue = REQUEST_OPERATION_MANAGER.operationQueue;
-        [REQUEST_OPERATION_MANAGER.reachabilityManager setReachabilityStatusChangeBlock:^(AFNetworkReachabilityStatus status) {
-            switch (status) {
-                case AFNetworkReachabilityStatusReachableViaWWAN:
-                case AFNetworkReachabilityStatusReachableViaWiFi:
-                    [operationQueue setSuspended:NO];
-                    break;
-                case AFNetworkReachabilityStatusNotReachable:
-                default:
-                    [operationQueue setSuspended:YES];
-                    break;
-            }
-        }];
-        
-        [REQUEST_OPERATION_MANAGER.reachabilityManager startMonitoring];
-    });
-    
-    REQUEST_OPERATION_MANAGER.requestSerializer = [AFHTTPRequestSerializer serializer];
-    
-    return REQUEST_OPERATION_MANAGER;
-}
+@implementation KIFormRequestFile
 @end
 
 @interface KIFormRequest ()
-@property (nonatomic, weak) KIHTTPRequestOperationManager *requestManager;
+@property (nonatomic, strong) AFHTTPSessionManager *manager;
+@property (nonatomic, strong) NSURLSessionTask     *task;
+
+@property (nonatomic, copy) KIFormRequestSuccessBlock          requestSuccessBlock;
+@property (nonatomic, copy) KIFormRequestFailureBlock          requestFailureBlock;
+@property (nonatomic, copy) KIFormRequestDownloadProgressBlock downloadProgressBlock;
+@property (nonatomic, copy) KIFormRequestUploadProgressBlock   uploadProgressBlock;
+
+@property (nonatomic, copy)   NSString            *method;
+@property (nonatomic, copy)   NSString            *URLString;
+@property (nonatomic, strong) NSMutableDictionary *headers;
+@property (nonatomic, strong) NSMutableDictionary *params;
+@property (nonatomic, strong) NSMutableDictionary *files;
+@property (nonatomic, strong) id                  body;
 @end
 
 @implementation KIFormRequest
 
-@synthesize identifier      = _identifier;
-@synthesize requestParam    = _requestParam;
-@synthesize error           = _error;
++ (NSMutableDictionary *)sharedRequestPool {
+    static NSMutableDictionary *pool = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        pool = [[NSMutableDictionary alloc] init];
+    });
+    return pool;
+}
+
++ (AFHTTPSessionManager *)sharedManager {
+    static AFHTTPSessionManager *manager = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        manager = [AFHTTPSessionManager manager];
+        NSSet *acceptableContentType = [[NSSet alloc] initWithObjects:@"application/xml", @"text/xml", @"text/html", @"application/json", @"text/plain", nil];
+        manager.responseSerializer.acceptableContentTypes = acceptableContentType;
+    });
+    return manager;
+}
 
 - (void)dealloc {
-    _identifier = nil;
-    _requestParam = nil;
-    _error = nil;
 }
 
-- (id)initWithParam:(KIRequestParam *)param {
-    return [self initWithParam:param manager:[KIHTTPRequestOperationManager sharedManager]];
-}
-
-- (id)initWithParam:(KIRequestParam *)param manager:(KIHTTPRequestOperationManager *)manager {
-    
-    self.requestManager = manager;
-    
-    [param.headers enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
-        [self.requestManager.requestSerializer setValue:obj forHTTPHeaderField:key];
-    }];
-    
-    NSString *method = [param.method copy];
-    NSString *URLString = [[NSURL URLWithString:param.urlString relativeToURL:self.requestManager.baseURL] absoluteString];
-    NSMutableDictionary *parameters = (NSMutableDictionary *)[param param];
-    
-    NSMutableURLRequest *request = nil;
-    
-    BOOL hasData = NO;
-    
-    if (param.postDatas != nil && param.postDatas.allValues != nil && param.postDatas.allValues.count > 0) {
-        hasData = YES;
+- (instancetype)init {
+    if (self = [super init]) {
+        self.manager = [KIFormRequest sharedManager];
     }
-    
-    if (hasData) {
-        request = [self.requestManager.requestSerializer multipartFormRequestWithMethod:@"POST"
-                                                                              URLString:URLString
-                                                                             parameters:parameters
-                                                              constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
-                                                                  NSArray *files = [[param postDatas] allValues];
-                                                                  [files enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-                                                                      KIPostData *postData = (KIPostData *)obj;
-                                                                      if (postData != nil && [postData isKindOfClass:[KIPostData class]]) {
-                                                                          if (postData.fileName) {
-                                                                              [formData appendPartWithFileData:postData.data
-                                                                                                          name:postData.key
-                                                                                                      fileName:postData.fileName
-                                                                                                      mimeType:postData.mineType];
-                                                                          } else {
-                                                                              [formData appendPartWithFormData:postData.data name:postData.key];
-                                                                          }
-                                                                      }
-                                                                  }];
-                                                              }
-                                                                                  error:nil];
-    } else {
-        request = [self.requestManager.requestSerializer requestWithMethod:method
-                                                                 URLString:URLString
-                                                                parameters:parameters
-                                                                     error:nil];
-    }
-    
-    id httpBody = [param httpBody];
-    
-    if (httpBody) {
-        NSData *data = [NSJSONSerialization dataWithJSONObject:httpBody
-                                                       options:NSJSONWritingPrettyPrinted
-                                                         error:nil];
-        [request setHTTPBody:data];
-    }
-    
-    [request setTimeoutInterval:param.timeout];
-    
-    if (self = [super initWithRequest:request]) {
-         _requestParam = param;
-        self.responseSerializer = self.requestManager.responseSerializer;
-        self.shouldUseCredentialStorage = self.requestManager.shouldUseCredentialStorage;
-        self.credential = self.requestManager.credential;
-        self.securityPolicy = self.requestManager.securityPolicy;
-    }
-    
     return self;
 }
 
-- (void)startRequest:(NSString *)identifier
-       finishedBlock:(KIFormRequestDidFinishedBlock)finishedBlock
-         failedBlock:(KIFormRequestDidFailedBlock)failedBlock {
-    
-    _identifier = identifier;
-    
-#if DEBUG
-    NSLog(@"发起网络请求[%@]：%@", self.request.HTTPMethod, self.request.URL.absoluteString);
-    NSLog(@"网络请求参数：%@", self.requestParam.param);
-    NSLog(@"网络请求头：%@", self.request.allHTTPHeaderFields);
-    if (self.request.HTTPBody != nil) {
-        NSLog(@"网络请求Body：%@", [[NSString alloc] initWithData:self.request.HTTPBody encoding:NSUTF8StringEncoding]);
+- (instancetype)initWithManager:(AFHTTPSessionManager *)manager {
+    if (self = [super init]) {
+        self.manager = manager;
     }
-#endif
+    return self;
+}
+
+#pragma mark - KVC
+- (void)setValue:(id)value forKey:(NSString *)key {
+    [self setValue:value forParamField:key];
+}
+
+- (id)valueForKey:(NSString *)key {
+    return [[self params] valueForKey:key];
+}
+
+#pragma mark - Public Methods
+- (void)setMethod:(NSString *)method {
+    _method = [method copy];
+}
+
+- (void)setURLString:(NSString *)URLString {
+    _URLString = [URLString copy];
+}
+
+- (void)setValue:(id)value forHeaderField:(NSString *)field {
+    if (field == nil) {
+        return;
+    }
+    if (value == nil) {
+        [[self headers] removeObjectForKey:field];
+        return ;
+    }
+    [[self headers] setValue:value forKey:field];
+}
+
+- (void)removeHeaderWithField:(NSString *)field {
+    if (field == nil) {
+        return ;
+    }
+    [[self headers] removeObjectForKey:field];
+}
+
+- (void)setValue:(id)value forParamField:(NSString *)field {
+    if (field == nil) {
+        return ;
+    }
+    if (value == nil) {
+        [[self params] removeObjectForKey:field];
+        return ;
+    }
+    [[self params] setValue:value forKey:field];
+}
+
+- (void)removeParamWithField:(NSString *)field {
+    if (field == nil) {
+        return ;
+    }
+    [[self params] removeObjectForKey:field];
+}
+
+- (void)setHttpBody:(id)body {
+    self.body = body;
+}
+
+- (void)addFile:(NSData *)fileData forKey:(NSString *)key fileName:(NSString *)fileName mimeType:(NSString *)mimeType {
+    if (fileData == nil || key == nil) {
+        return ;
+    }
+    KIFormRequestFile *file = [[KIFormRequestFile alloc] init];
+    [file setData:fileData];
+    [file setFileName:fileName];
+    [file setKey:key];
+    [file setMimeType:mimeType];
     
+    [self.files setObject:file forKey:key];
+}
+
+- (void)addPNGFile:(UIImage *)image forKey:(NSString *)key fileName:(NSString *)fileName {
+    [self addFile:UIImagePNGRepresentation(image) forKey:key fileName:fileName mimeType:@"image/jpeg"];
+}
+
+- (void)addJPEGFile:(UIImage *)image forKey:(NSString *)key fileName:(NSString *)fileName {
+    [self addFile:UIImageJPEGRepresentation(image, 1.0) forKey:key fileName:fileName mimeType:@"image/jpeg"];
+}
+
+- (void)startRequest {
+    AFHTTPSessionManager *manager = [self manager];
+    
+    [self.headers enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+        [manager.requestSerializer setValue:obj forHTTPHeaderField:key];
+    }];
+    
+    if (self.body != nil) {
+        [self requestWithBody];
+    } else if (self.files.allValues.count > 0) {
+        self.task = [self requestWithFile];
+    } else {
+        self.task = [self defaultRequest];
+    }
+    
+    if (self.task != nil) {
+        [[KIFormRequest sharedRequestPool] setObject:self forKey:@(self.task.taskIdentifier)];
+        [self.task resume];
+    }
+}
+
+- (void)cancel {
+    if (self.task != nil) {
+        [self.task cancel];
+    }
+}
+
+#pragma mark - Private Methods
+- (NSURLSessionDataTask *)requestWithBody {
+    AFHTTPSessionManager *manager = [self manager];
     __weak KIFormRequest *weakSelf = self;
     
-    [self setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
-        if (finishedBlock) {
-            KIFormRequest *request = (KIFormRequest *)operation;
-            finishedBlock(request, request.responseStatusCode, operation.responseObject);
-        }
-    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-        [weakSelf setError:error];
-        if (failedBlock) {
+    NSMutableURLRequest *req = [[AFJSONRequestSerializer serializer] requestWithMethod:@"POST"
+                                                                             URLString:self.URLString
+                                                                            parameters:nil error:nil];
+    
+    req.timeoutInterval= manager.requestSerializer.timeoutInterval;
+    [self.headers enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+        [req setValue:obj forHTTPHeaderField:key];
+    }];
+    [req setHTTPBody:self.body];
+    
+    NSURLSessionDataTask *task = [manager dataTaskWithRequest:req
+                                            completionHandler:^(NSURLResponse *response, id responseObject, NSError *error) {
+                                                if (error != nil) {
+                                                    [weakSelf dispatchFailureMsg:response error:error];
+                                                } else {
+                                                    [weakSelf dispatchSuccessMsg:response responseObject:responseObject];
+                                                }
+                                            }];
+    return task;
+}
+
+- (NSURLSessionDataTask *)requestWithFile {
+    AFHTTPSessionManager *manager = [self manager];
+    __weak KIFormRequest *weakSelf = self;
+    
+    NSURLSessionDataTask *task = [manager POST:self.URLString
+                                    parameters:self.params
+                     constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
+                         for (KIFormRequestFile *file in weakSelf.files.allValues) {
+                             [formData appendPartWithFileData:file.data name:file.key fileName:file.fileName mimeType:file.mimeType];
+                         }
+                     } progress:^(NSProgress *uploadProgress) {
+                         [weakSelf dispatchUploadProgressMsg:uploadProgress];
+                     } success:^(NSURLSessionDataTask *task, id responseObject) {
+                         [weakSelf dispatchSuccessMsg:task.response responseObject:responseObject];
+                     } failure:^(NSURLSessionDataTask *task, NSError *error) {
+                         [weakSelf dispatchFailureMsg:task.response error:error];
+                     }];
+    return task;
+}
+
+- (NSURLSessionDataTask *)defaultRequest {
+    AFHTTPSessionManager *manager = [self manager];
+    __weak KIFormRequest *weakSelf = self;
+    
+    NSURLSessionDataTask *task = [(id<AFHTTPManager>)manager dataTaskWithHTTPMethod:self.method
+                                                                          URLString:self.URLString
+                                                                         parameters:self.params
+                                                                     uploadProgress:^(NSProgress *uploadProgress) {
+                                                                         [weakSelf dispatchUploadProgressMsg:uploadProgress];
+                                                                     } downloadProgress:^(NSProgress *downloadProgress) {
+                                                                         [weakSelf dispatchDownloadProgressMsg:downloadProgress];
+                                                                     } success:^(NSURLSessionDataTask *task, id responseObject) {
+                                                                         [weakSelf dispatchSuccessMsg:task.response responseObject:responseObject];
+                                                                     } failure:^(NSURLSessionDataTask *task, NSError * error) {
+                                                                         [weakSelf dispatchFailureMsg:task.response error:error];
+                                                                     }];
+    
 #if DEBUG
-            NSLog(@"网络请求错误：%@", error);
+    NSLog(@"============================================================");
+    NSLog(@"发起网络请求[%@]：%@", self.method, self.URLString);
+    NSLog(@"网络请求参数：%@", self.params);
+    NSLog(@"网络请求头：%@", task.currentRequest.allHTTPHeaderFields);
+    NSLog(@"============================================================");
 #endif
-            KIFormRequest *request = (KIFormRequest *)operation;
-            failedBlock(request, request.responseStatusCode, error);
-        }
-    }];
-    
-    [self.requestManager.operationQueue addOperation:self];
+    return task;
 }
 
-- (void)setError:(NSError *)error {
-    _error = error;
+- (void)dispatchSuccessMsg:(NSURLResponse *)task responseObject:(id)responseObject {
+    if (self.requestSuccessBlock != nil) {
+        NSHTTPURLResponse *response = (NSHTTPURLResponse *)task;
+        self.requestSuccessBlock(response.statusCode, responseObject);
+    }
+    [[KIFormRequest sharedRequestPool] removeObjectForKey:@(self.task.taskIdentifier)];
 }
 
-- (NSInteger)responseStatusCode {
-    return self.response.statusCode;
+- (void)dispatchFailureMsg:(NSURLResponse *)task error:(NSError *)error {
+#if DEBUG
+    NSLog(@"网络请求错误：%@", error);
+#endif
+    if (self.requestFailureBlock != nil) {
+        NSHTTPURLResponse *response = (NSHTTPURLResponse *)task;
+        NSData *responseData = (NSData *)error.userInfo[AFNetworkingOperationFailingURLResponseDataErrorKey];
+        self.requestFailureBlock(response.statusCode, error, responseData);
+    }
+    [[KIFormRequest sharedRequestPool] removeObjectForKey:@(self.task.taskIdentifier)];
 }
 
-- (id)responseObject {
-    id object = [super responseObject];
-    return object != nil ? object : self.responseString;
+- (void)dispatchDownloadProgressMsg:(NSProgress *)downloadProgress {
+    if (self.downloadProgressBlock != nil) {
+        self.downloadProgressBlock(downloadProgress);
+    }
 }
 
-+ (KIFormRequest *)startRequest:(KIRequestParam *)param
-                  finishedBlock:(KIFormRequestDidFinishedBlock)finishedBlock
-                    failedBlock:(KIFormRequestDidFailedBlock)failedBlock {
-    KIFormRequest *requeset = [[KIFormRequest alloc] initWithParam:param];
-    [requeset startRequest:param.urlString
-             finishedBlock:finishedBlock
-               failedBlock:failedBlock];
-    return requeset;
+- (void)dispatchUploadProgressMsg:(NSProgress *)uploadProgress {
+    if (self.uploadProgressBlock != nil) {
+        self.uploadProgressBlock(uploadProgress);
+    }
 }
 
-+ (KIFormRequest *)startRequest:(NSString *)urlString
-                         method:(NSString *)method
-                         params:(NSDictionary *)params
-                  finishedBlock:(KIFormRequestDidFinishedBlock)finishedBlock
-                    failedBlock:(KIFormRequestDidFailedBlock)failedBlock {
-    KIRequestParam *param = [[KIRequestParam alloc] init];
-    [param setUrlString:urlString];
-    [param setMethod:method];
-    
-    [params enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
-        [param addParam:obj forKey:key];
-    }];
-    
-    return [KIFormRequest startRequest:param
-                         finishedBlock:finishedBlock
-                           failedBlock:failedBlock];
+#pragma mark - Getters & Setters
+- (NSMutableDictionary *)headers {
+    if (_headers == nil) {
+        _headers = [[NSMutableDictionary alloc] init];
+    }
+    return _headers;
 }
 
-+ (KIFormRequest *)doGet:(NSString *)urlString
-                  params:(NSDictionary *)params
-           finishedBlock:(KIFormRequestDidFinishedBlock)finishedBlock
-             failedBlock:(KIFormRequestDidFailedBlock)failedBlock {
-    return [KIFormRequest startRequest:urlString
-                                method:KIHttpGet
-                                params:params
-                         finishedBlock:finishedBlock
-                           failedBlock:failedBlock];
+- (NSMutableDictionary *)params {
+    if (_params == nil) {
+        _params = [[NSMutableDictionary alloc] init];
+    }
+    return _params;
 }
 
-+ (KIFormRequest *)doPost:(NSString *)urlString
-                   params:(NSDictionary *)params
-            finishedBlock:(KIFormRequestDidFinishedBlock)finishedBlock
-              failedBlock:(KIFormRequestDidFailedBlock)failedBlock {
-    return [KIFormRequest startRequest:urlString
-                                method:KIHttpPost
-                                params:params
-                         finishedBlock:finishedBlock
-                           failedBlock:failedBlock];
+- (NSMutableDictionary *)files {
+    if (_files == nil) {
+        _files = [[NSMutableDictionary alloc] init];
+    }
+    return _files;
 }
 
-+ (KIFormRequest *)doDelete:(NSString *)urlString
-                     params:(NSDictionary *)params
-              finishedBlock:(KIFormRequestDidFinishedBlock)finishedBlock
-                failedBlock:(KIFormRequestDidFailedBlock)failedBlock {
-    return [KIFormRequest startRequest:urlString
-                                method:KIHttpDelete
-                                params:params
-                         finishedBlock:finishedBlock
-                           failedBlock:failedBlock];
+- (void)successBlock:(KIFormRequestSuccessBlock)block {
+    [self setRequestSuccessBlock:block];
 }
 
-+ (KIFormRequest *)doPut:(NSString *)urlString
-                  params:(NSDictionary *)params
-           finishedBlock:(KIFormRequestDidFinishedBlock)finishedBlock
-             failedBlock:(KIFormRequestDidFailedBlock)failedBlock {
-    return [KIFormRequest startRequest:urlString
-                                method:KIHttpPut
-                                params:params
-                         finishedBlock:finishedBlock
-                           failedBlock:failedBlock];
+- (void)failureBlock:(KIFormRequestFailureBlock)block {
+    [self setRequestFailureBlock:block];
 }
 
-+ (KIFormRequest *)doPatch:(NSString *)urlString
-                    params:(NSDictionary *)params
-             finishedBlock:(KIFormRequestDidFinishedBlock)finishedBlock
-               failedBlock:(KIFormRequestDidFailedBlock)failedBlock {
-    return [KIFormRequest startRequest:urlString
-                                method:KIHttpPatch
-                                params:params
-                         finishedBlock:finishedBlock
-                           failedBlock:failedBlock];
+- (void)downloadProgressBlock:(KIFormRequestDownloadProgressBlock)block {
+    [self setDownloadProgressBlock:block];
 }
 
-+ (KIFormRequest *)doHead:(NSString *)urlString
-                   params:(NSDictionary *)params
-            finishedBlock:(KIFormRequestDidFinishedBlock)finishedBlock
-              failedBlock:(KIFormRequestDidFailedBlock)failedBlock {
-    return [KIFormRequest startRequest:urlString
-                                method:KIHttpHead
-                                params:params
-                         finishedBlock:finishedBlock
-                           failedBlock:failedBlock];
+- (void)uploadProgressBlock:(KIFormRequestUploadProgressBlock)block {
+    [self setUploadProgressBlock:block];
 }
 
 @end

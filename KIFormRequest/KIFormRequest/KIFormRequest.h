@@ -1,79 +1,59 @@
 //
 //  KIFormRequest.h
-//  Kitalker
+//  KIFormRequest
 //
-//  Created by 杨 烽 on 12-10-29.
-//
+//  Created by apple on 17/5/9.
+//  Copyright © 2017年 smartwalle. All rights reserved.
 //
 
+#import <Foundation/Foundation.h>
 #import "AFNetworking.h"
-#import "KIRequestParam.h"
 
 @class KIFormRequest;
-typedef void(^KIFormRequestDidFinishedBlock)    (KIFormRequest *request, NSInteger statusCode, id responseObject);
-typedef void(^KIFormRequestDidFailedBlock)      (KIFormRequest *request, NSInteger statusCode, NSError *error);
+typedef void(^KIFormRequestSuccessBlock)          (NSInteger statusCode, id responseObject);
+typedef void(^KIFormRequestFailureBlock)          (NSInteger statusCode, NSError *error, NSData *responseData);
+typedef void(^KIFormRequestDownloadProgressBlock) (NSProgress *downloadProgress);
+typedef void(^KIFormRequestUploadProgressBlock)   (NSProgress *uploadProgress);
 
-@interface KIHTTPRequestOperationManager : AFHTTPRequestOperationManager
-+ (KIHTTPRequestOperationManager *)sharedManager;
-@end
+@interface KIFormRequest : NSObject
 
-@interface KIFormRequest : AFHTTPRequestOperation {
-    NSString                    *_identifier;
-    KIRequestParam              *_requestParam;
-    NSError                     *_error;
-}
++ (AFHTTPSessionManager *)sharedManager;
 
-@property (nonatomic, strong, readonly) NSString        *identifier;
-@property (nonatomic, strong, readonly) KIRequestParam  *requestParam;
-@property (nonatomic, assign, readonly) NSInteger       responseStatusCode;
-@property (nonatomic, readonly)         NSError         *error;
+- (instancetype)init;
+- (instancetype)initWithManager:(AFHTTPSessionManager *)manager;
 
-- (id)initWithParam:(KIRequestParam *)param;
+- (void)successBlock:(KIFormRequestSuccessBlock)block;
+- (void)failureBlock:(KIFormRequestFailureBlock)block;
+- (void)downloadProgressBlock:(KIFormRequestDownloadProgressBlock)block;
+- (void)uploadProgressBlock:(KIFormRequestUploadProgressBlock)block;
 
-- (id)initWithParam:(KIRequestParam *)param manager:(KIHTTPRequestOperationManager *)manager;
+- (void)startRequest;
+- (void)cancel;
 
-- (void)startRequest:(NSString *)identifier
-       finishedBlock:(KIFormRequestDidFinishedBlock)finishedBlock
-         failedBlock:(KIFormRequestDidFailedBlock)failedBlock;
+// HTTP 请求方法
+- (void)setMethod:(NSString *)method;
 
-+ (KIFormRequest *)startRequest:(KIRequestParam *)param
-                  finishedBlock:(KIFormRequestDidFinishedBlock)finishedBlock
-                    failedBlock:(KIFormRequestDidFailedBlock)failedBlock;
+// HTTP 请求 URL 地址
+- (void)setURLString:(NSString *)URLString;
 
-+ (KIFormRequest *)startRequest:(NSString *)urlString
-                         method:(NSString *)method
-                         params:(NSDictionary *)params
-                  finishedBlock:(KIFormRequestDidFinishedBlock)finishedBlock
-                    failedBlock:(KIFormRequestDidFailedBlock)failedBlock;
+// HTTP 请求头
+- (void)setValue:(id)value forHeaderField:(NSString *)field;
 
-+ (KIFormRequest *)doGet:(NSString *)urlString
-                  params:(NSDictionary *)params
-           finishedBlock:(KIFormRequestDidFinishedBlock)finishedBlock
-             failedBlock:(KIFormRequestDidFailedBlock)failedBlock;
+- (void)removeHeaderWithField:(NSString *)field;
 
-+ (KIFormRequest *)doPost:(NSString *)urlString
-                   params:(NSDictionary *)params
-            finishedBlock:(KIFormRequestDidFinishedBlock)finishedBlock
-              failedBlock:(KIFormRequestDidFailedBlock)failedBlock;
+// HTTP 请求参数
+- (void)setValue:(id)value forParamField:(NSString *)field;
 
-+ (KIFormRequest *)doDelete:(NSString *)urlString
-                     params:(NSDictionary *)params
-              finishedBlock:(KIFormRequestDidFinishedBlock)finishedBlock
-                failedBlock:(KIFormRequestDidFailedBlock)failedBlock;
+- (void)removeParamWithField:(NSString *)field;
 
-+ (KIFormRequest *)doPut:(NSString *)urlString
-                  params:(NSDictionary *)params
-           finishedBlock:(KIFormRequestDidFinishedBlock)finishedBlock
-             failedBlock:(KIFormRequestDidFailedBlock)failedBlock;
+// HTTP Body
+- (void)setHttpBody:(id)body;
 
-+ (KIFormRequest *)doPatch:(NSString *)urlString
-                    params:(NSDictionary *)params
-             finishedBlock:(KIFormRequestDidFinishedBlock)finishedBlock
-               failedBlock:(KIFormRequestDidFailedBlock)failedBlock;
+// 上传文件
+- (void)addFile:(NSData *)fileData forKey:(NSString *)key fileName:(NSString *)fileName mimeType:(NSString *)mimeType;
 
-+ (KIFormRequest *)doHead:(NSString *)urlString
-                   params:(NSDictionary *)params
-            finishedBlock:(KIFormRequestDidFinishedBlock)finishedBlock
-              failedBlock:(KIFormRequestDidFailedBlock)failedBlock;
+- (void)addPNGFile:(UIImage *)image forKey:(NSString *)key fileName:(NSString *)fileName;
+
+- (void)addJPEGFile:(UIImage *)image forKey:(NSString *)key fileName:(NSString *)fileName;
 
 @end
